@@ -5,10 +5,10 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -22,7 +22,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    'lms',
+    "lms",
+    "users"
 ]
 
 MIDDLEWARE = [
@@ -60,12 +61,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
     "default": {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DATABASE_NAME', default='online_training_drf1'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT', default='5432'),
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.getenv("DATABASE_NAME", default="online_training_drf1"),
+        "USER": os.getenv("DATABASE_USER"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "HOST": os.getenv("DATABASE_HOST"),
+        "PORT": os.getenv("DATABASE_PORT", default="5432"),
     }
 }
 
@@ -110,8 +111,8 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     # Здесь вы можете добавить пути к вашим статическим файлам,
     # если они располагаются вне приложений
-    os.path.join( BASE_DIR ,'static'),
+    os.path.join( BASE_DIR ,"static"),
 ]
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
