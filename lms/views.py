@@ -6,5 +6,6 @@ from lms.serializers import CourseSerializer
 
 class CourseViewSet(viewsets.ViewSet):
     """CRUD для курса"""
-    serializer_class = CourseSerializer
     queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+
