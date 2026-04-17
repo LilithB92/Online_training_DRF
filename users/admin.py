@@ -16,7 +16,13 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ("user", "payment_date", "course", "lesson", "amount",)
+    list_display = (
+        "user",
+        "payment_date",
+        "course",
+        "lesson",
+        "amount",
+    )
 
     # Removes the ability to add new objects
     def has_add_permission(self, request):
