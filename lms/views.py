@@ -7,6 +7,7 @@ from rest_framework.generics import UpdateAPIView
 
 from lms.models import Course
 from lms.models import Lesson
+from lms.serializers import CourseDetailSerializer
 from lms.serializers import CourseSerializer
 from lms.serializers import LessonSerializer
 
@@ -15,7 +16,11 @@ class CourseViewSet(viewsets.ModelViewSet):
     """CRUD для курса"""
 
     queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return CourseDetailSerializer
+        return CourseSerializer
 
 
 class LessonCreateApiView(CreateAPIView):
