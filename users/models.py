@@ -11,6 +11,7 @@ class User(AbstractUser):
     """
     Stores a single user entry, related to :model:`users.Payment`
     """
+
     username = None
     email = models.EmailField(unique=True, verbose_name="Почта", help_text="Введите Вашу почту")
     phone_number = models.CharField(
