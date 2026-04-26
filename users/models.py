@@ -8,6 +8,10 @@ from lms.models import Lesson
 
 # Create your models here.
 class User(AbstractUser):
+    """
+    Stores a single user entry, related to :model:`users.Payment`
+    """
+
     email = models.EmailField(unique=True, verbose_name="Почта", help_text="Введите Вашу почту")
     phone_number = models.CharField(
         max_length=30, blank=True, null=True, verbose_name="Телефон", help_text="Введите Ваш номер телефона"
@@ -29,6 +33,10 @@ class User(AbstractUser):
 
 
 class Payment(models.Model):
+    """
+    Stores a single payment entry, related to :model:`users.User`,:model:`lms.Lesson` and :model:`lms.Class`
+    """
+
     PAYMENT_METHOD_CHOICES = [
         ("cash", "Наличные"),
         ("transfer", "Перевод на счет"),

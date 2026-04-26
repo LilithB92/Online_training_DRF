@@ -2,6 +2,10 @@ from django.db import models
 
 
 class Course(models.Model):
+    """
+    Stores a single course entry, related to :model:`lms.Lesson`
+    """
+
     title = models.CharField(max_length=200, verbose_name="Название курса")
     # Поле для картинки, сохраняется в MEDIA_ROOT/courses/
     preview = models.ImageField(upload_to="courses/", verbose_name="Превью", blank=True, null=True)
@@ -16,6 +20,10 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
+    """
+    Stores a single lesson entry, related to :model:`lms.Course`
+    """
+
     title = models.CharField(max_length=200, verbose_name="Название урока")
     description = models.TextField(verbose_name="Описание урока", blank=True, null=True)
     preview = models.ImageField(upload_to="lessons/previews/", verbose_name="Превью", blank=True, null=True)
