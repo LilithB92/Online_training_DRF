@@ -7,11 +7,12 @@ class Command(BaseCommand):
     help = "Создать супер юзера"
 
     def handle(self, *args, **options):
-        user = User.objects.create(email="admin@mail.com")
+        user = User.objects.create(email="admin@gmail.com")
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
         user.set_password("admin1111")
+        user.save()
 
         if user:
             self.stdout.write(self.style.SUCCESS(f"Successfully added superuser: {user.__str__()}"))
