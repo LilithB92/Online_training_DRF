@@ -5,6 +5,12 @@ from users.models import User
 
 
 class PaymentSerializer(ModelSerializer):
+    """
+    Сериализатор для модели «Оплаты».
+
+    Обрабатывает преобразование экземпляров оплаты в формат JSON и выполняет валидацию
+    входящие данные для удаления, просмотра, создания или обновления оплаты.
+    """
     class Meta:
         model = Payment
         fields = "__all__"
@@ -12,6 +18,12 @@ class PaymentSerializer(ModelSerializer):
 
 
 class UserSerializer(ModelSerializer):
+    """
+        Сериализатор для модели «Пользователи».
+
+        Обрабатывает преобразование экземпляров пользователи в формат JSON и выполняет валидацию
+        входящие данные регистрации пользователи.
+    """
     class Meta:
         model = User
         fields = ("id", "email", "phone_number", "avatar", "country", "password")
