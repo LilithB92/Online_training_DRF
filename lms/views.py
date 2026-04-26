@@ -26,6 +26,13 @@ class CourseViewSet(viewsets.ModelViewSet):
             return CourseDetailSerializer
         return CourseSerializer
 
+    def perform_create(self, serializer):
+        """При создании курса поле для владельца сущности заполняется аутентифицированным пользователем."""
+
+        course = serializer.save()
+        course.owner = self.request.user
+        course.save()
+
     def get_permissions(self):
         """Задает прав для каждого эндпойнта"""
         if self.action == "create":
@@ -43,6 +50,13 @@ class LessonCreateApiView(CreateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = (IsAuthenticated, ~IsModerator)
+
+    def perform_create(self, serializer):
+        """При создании урока поле для владельца сущности заполняется аутентифицированным пользователем."""
+
+        lesson = serializer.save()
+        lesson.owner = self.request.user
+        lesson.save()
 
 
 class LessonListApiView(ListAPIView):
