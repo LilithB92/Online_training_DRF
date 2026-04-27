@@ -11,6 +11,7 @@ class PaymentSerializer(ModelSerializer):
     Обрабатывает преобразование экземпляров оплаты в формат JSON и выполняет валидацию
     входящие данные для удаления, просмотра, создания или обновления оплаты.
     """
+
     class Meta:
         model = Payment
         fields = "__all__"
@@ -19,11 +20,29 @@ class PaymentSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
     """
-        Сериализатор для модели «Пользователи».
+    Сериализатор для модели «Пользователи».
 
-        Обрабатывает преобразование экземпляров пользователи в формат JSON и выполняет валидацию
-        входящие данные регистрации пользователи.
+    Обрабатывает преобразование экземпляров пользователи в формат JSON и выполняет валидацию
+    входящие данные регистрации пользователи.
     """
+
     class Meta:
         model = User
         fields = ("id", "email", "phone_number", "avatar", "country", "password")
+
+
+class UserNotOwnerSerializer(ModelSerializer):
+    """
+    Сериализатор для модели «Пользователи», не для владельца.
+
+    Обрабатывает преобразование экземпляров пользователи в формат JSON и выполняет просмотра данных.
+    """
+
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "phone_number",
+            "avatar",
+            "country",
+        )

@@ -13,3 +13,10 @@ class IsOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
+
+
+class IsUserOwner(permissions.BasePermission):
+    """Проверяет, является пользователь владельцем пользовательского аккаунта"""
+
+    def has_object_permission(self, request, view, obj):
+        return request.user.email == obj.email
