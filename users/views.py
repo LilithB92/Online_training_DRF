@@ -11,9 +11,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from users.models import Payment
 from users.models import User
-from users.permissions import IsOwner
 from users.permissions import IsUserOwner
 from users.serializers import PaymentSerializer
+from users.serializers import UserGeneralInformationSerializer
 from users.serializers import UserSerializer
 
 
@@ -41,11 +41,11 @@ class UserCreateAPIView(CreateAPIView):
 
 
 class UserListApiView(ListAPIView):
-    """Получение списка уроков"""
+    """Получение списка пользователей"""
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = IsAuthenticated
+    serializer_class = UserGeneralInformationSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class UserRetrieveAPIView(RetrieveAPIView):
@@ -53,7 +53,7 @@ class UserRetrieveAPIView(RetrieveAPIView):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = IsAuthenticated
+    permission_classes = (IsAuthenticated,)
 
 
 class UserUpdateAPIView(UpdateAPIView):
@@ -61,7 +61,7 @@ class UserUpdateAPIView(UpdateAPIView):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated, IsOwner)
+    permission_classes = (IsAuthenticated, IsUserOwner)
 
 
 class UserDestroyAPIView(DestroyAPIView):

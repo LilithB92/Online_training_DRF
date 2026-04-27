@@ -31,7 +31,7 @@ class UserSerializer(ModelSerializer):
         fields = ("id", "email", "phone_number", "avatar", "country", "password")
 
 
-class UserNotOwnerSerializer(ModelSerializer):
+class UserGeneralInformationSerializer(ModelSerializer):
     """
     Сериализатор для модели «Пользователи», не для владельца.
 
