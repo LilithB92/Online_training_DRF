@@ -15,6 +15,7 @@ from users.permissions import IsUserOwner
 from users.serializers import PaymentSerializer
 from users.serializers import UserGeneralInformationSerializer
 from users.serializers import UserSerializer
+from users.serializers import UserUpdateSerializer
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -60,8 +61,12 @@ class UserUpdateAPIView(UpdateAPIView):
     """Изменение одной сущности пользователя"""
 
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserUpdateSerializer
     permission_classes = (IsAuthenticated, IsUserOwner)
+
+    def perform_update(self, serializer):
+        """Метод serializer.save() вызывает метод .update(), определенный в UserUpdateSerializer."""
+        serializer.save()
 
 
 class UserDestroyAPIView(DestroyAPIView):

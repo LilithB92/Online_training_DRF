@@ -21,7 +21,7 @@ urlpatterns = [
     path("login/", TokenObtainPairView.as_view(permission_classes=(AllowAny,)), name="login"),
     path("token/refresh/", TokenRefreshView.as_view(permission_classes=(AllowAny,)), name="token_refresh"),
     path("list/", UserListApiView.as_view(), name="user_list"),
-    path("update/<int:id>/", UserUpdateAPIView.as_view(), name="update"),
+    path("update/<int:pk>/", UserUpdateAPIView.as_view(), name="update"),
     path("delete/<int:pk>/", UserDestroyAPIView.as_view(), name="delete"),
 ]
 urlpatterns += router.urls
