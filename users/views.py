@@ -50,11 +50,17 @@ class UserListApiView(ListAPIView):
 
 
 class UserRetrieveAPIView(RetrieveAPIView):
-    """Получение одной сущности урока"""
+    """Получение одной сущности пользователя"""
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_serializer_class(self):
+        """просмотра чужого профиля должна быть доступна только общая информация, а в собственном вся"""
+        if self.request.user.id == self.kwargs.get("pk"):
+            return UserSerializer
+        return UserGeneralInformationSerializer
 
 
 class UserUpdateAPIView(UpdateAPIView):

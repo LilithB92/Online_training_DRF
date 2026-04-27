@@ -9,6 +9,7 @@ from .views import PaymentViewSet
 from .views import UserCreateAPIView
 from .views import UserDestroyAPIView
 from .views import UserListApiView
+from .views import UserRetrieveAPIView
 from .views import UserUpdateAPIView
 
 app_name = UsersConfig.name
@@ -21,6 +22,7 @@ urlpatterns = [
     path("login/", TokenObtainPairView.as_view(permission_classes=(AllowAny,)), name="login"),
     path("token/refresh/", TokenRefreshView.as_view(permission_classes=(AllowAny,)), name="token_refresh"),
     path("list/", UserListApiView.as_view(), name="user_list"),
+    path("detail/<int:pk>/", UserRetrieveAPIView.as_view(), name="user_detail"),
     path("update/<int:pk>/", UserUpdateAPIView.as_view(), name="update"),
     path("delete/<int:pk>/", UserDestroyAPIView.as_view(), name="delete"),
 ]
