@@ -57,9 +57,11 @@ class Lesson(models.Model):
 
 
 class CourseSubscription(models.Model):
+    """
+       Stores a single course subscription, related to :model:`lms.Course` and :model:`users.User`.
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_subscriptions')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='subscribers')
-    is_active = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('user', 'course')

@@ -1,14 +1,17 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from rest_framework.response import Response
+from rest_framework import filters, status
 from rest_framework import viewsets
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, get_object_or_404
 from rest_framework.generics import DestroyAPIView
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
+from lms.models import CourseSubscription, Course
 from users.models import Payment
 from users.models import User
 from users.permissions import IsUserOwner
@@ -80,3 +83,37 @@ class UserDestroyAPIView(DestroyAPIView):
 
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, IsUserOwner)
+
+
+class SubscriptionAPIView(APIView):
+    """ API View для управления подпиской пользователя на курс.
+
+    Работает в режиме 'toggle' (переключатель): если подписки нет — создает,
+    если есть — удаляет.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, *args, **kwargs):
+        """
+      Обрабатывает POST-запрос на изменение статуса подписки.
+      Ожидает в body:
+      {
+          "course": <int:id_курса>
+      }
+      """
+        user = self.request.user
+        course_id = self.request.data.get('course_id')
+        if not course_id:
+            return Response(
+                {"error": "course_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        course_item = get_object_or_404(Course, id=course_id)
+        subs_item = CourseSubscription.objects.filter(user=user, course=course_item)
+        if subs_item.exists():
+            subs_item.delete()
+            message = 'подписка удалена'
+        else:
+            CourseSubscription.objects.create(user=user, course=course_item)
+            message = 'подписка добавлена'
+        return Response({"message": message}, status=status.HTTP_200_OK)
