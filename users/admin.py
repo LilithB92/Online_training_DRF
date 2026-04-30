@@ -7,15 +7,19 @@ from users.models import User
 # Register your models here.
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "email",
-        "username",
-    )
+    """
+       Администрирование модели Пользователь(User).
+       Супер позволяет управлять пользователями и их активностью.
+    """
+    list_display = ("id", "email", "phone_number", "avatar", "country")
 
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    """
+       Администрирование модели Оплат(Payment).
+       Супер пользователь следит за оплатами.
+    """
     list_display = (
         "user",
         "payment_date",
