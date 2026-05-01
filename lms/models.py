@@ -10,6 +10,7 @@ class Course(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название курса")
     # Поле для картинки, сохраняется в MEDIA_ROOT/courses/
     preview = models.ImageField(upload_to="courses/", verbose_name="Превью", blank=True, null=True)
+    course_url = models.URLField(verbose_name="Ссылка на курс", blank=True, null=True)
     description = models.TextField(verbose_name="Описание курса", blank=True, null=True)
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -53,3 +54,14 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
+
+
+class CourseSubscription(models.Model):
+    """
+       Stores a single course subscription, related to :model:`lms.Course` and :model:`users.User`.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_subscriptions')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='subscribers')
+
+    class Meta:
+        unique_together = ('user', 'course')

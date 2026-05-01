@@ -40,14 +40,14 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit tests / coverage reports
-htmlcov/
+#htmlcov/
 .tox/
 .nox/
 #.coverage
 #.coverage.*
 .cache
 nosetests.xml
-coverage.xml
+#coverage.xml
 #*.cover
 #*.py,cover
 .hypothesis/
