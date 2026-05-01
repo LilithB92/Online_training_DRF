@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from lms.models import Course
 from lms.models import Lesson
+from lms.paginators import LessonCoursePagination
 from lms.serializers import CourseDetailSerializer
 from lms.serializers import CourseSerializer
 from lms.serializers import LessonSerializer
@@ -18,7 +19,8 @@ from users.permissions import IsOwner
 class CourseViewSet(viewsets.ModelViewSet):
     """CRUD для курса"""
 
-    queryset = Course.objects.all()
+    queryset = Course.objects.all().order_by("pk")
+    pagination_class = LessonCoursePagination
 
     def get_serializer_class(self):
         """Для извлечения или чтения данных используется `CourseDetailSerializer`, a
@@ -63,9 +65,10 @@ class LessonCreateApiView(CreateAPIView):
 class LessonListApiView(ListAPIView):
     """Получение списка уроков"""
 
-    queryset = Lesson.objects.all()
+    queryset = Lesson.objects.all().order_by("pk")
     serializer_class = LessonSerializer
     permission_classes = (IsAuthenticated, IsOwner | IsModerator)
+    pagination_class = LessonCoursePagination
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
