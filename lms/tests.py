@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from lms.models import Course
+from lms.models import CourseSubscription
 from lms.models import Lesson
 from users.models import User
 
@@ -79,3 +80,44 @@ class LessonAPITestCase(APITestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Lesson.objects.all().count(), 0)
+
+
+class SubscriptionAPITestCase(APITestCase):
+    """Тестирование функционала подписок на курсы."""
+
+    def setUp(self):
+        """Подготовка данных для тестов."""
+        self.user = User.objects.create(email="test@mail.ru")
+        self.course = Course.objects.create(title="python", owner=self.user)
+        self.url = reverse(viewname="lms:course_subscribe")
+        # Авторизуем пользователя
+        self.client.force_authenticate(user=self.user)
+
+    def test_subscribe_to_course(self):
+        """Тестирование добавления подписки."""
+        data = {"course_id": self.course.id}
+        response = self.client.post(self.url, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["message"], "подписка добавлена")
+        self.assertTrue(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
+
+    def test_unsubscribe_from_course(self):
+        """Тестирование удаления подписки (toggle)."""
+
+        # Сначала создаем подписку
+        CourseSubscription.objects.create(user=self.user, course=self.course)
+        data = {"course_id": self.course.pk}
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["message"], "подписка удалена")
+        self.assertFalse(CourseSubscription.objects.filter(user=self.user, course=self.course).exists())
+
+    def test_is_subscribed_field(self):
+        """Тестирование наличия признака подписки в данных курса."""
+        CourseSubscription.objects.create(user=self.user, course=self.course)
+        course_detail_url = reverse("lms:courses-detail", args=(self.course.pk,))
+        response = self.client.get(course_detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["is_subscribed"], True)
