@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from users.models import Payment
 from users.models import User
 from users.permissions import IsUserOwner
-from users.serializers import PaymentSerializer
+from users.serializers import PaymentSerializer, PaymentCourseSerializer
 from users.serializers import UserGeneralInformationSerializer
 from users.serializers import UserSerializer
 from users.serializers import UserUpdateSerializer
@@ -80,3 +80,20 @@ class UserDestroyAPIView(DestroyAPIView):
 
     queryset = User.objects.all()
     permission_classes = (IsAuthenticated, IsUserOwner)
+
+
+class PaymentCourseCreateApiView(CreateAPIView):
+    """Создание одной сущности платежа"""
+
+    queryset = Payment.objects.all()
+    serializer_class =PaymentCourseSerializer
+    permission_classes = (IsAuthenticated)
+
+    def perform_create(self, serializer):
+        """ Создает session_id страйпа для оплаты курса """
+
+        payment = serializer.save(user=self.request.user)
+
+        # lesson.owner = self.request.user
+        # lesson.save()
+

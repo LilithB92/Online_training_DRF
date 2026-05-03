@@ -19,6 +19,19 @@ class PaymentSerializer(ModelSerializer):
         read_only_fields = ["payment_date", "user"]
 
 
+class PaymentCourseSerializer(ModelSerializer):
+    """
+        Сериализатор для модели «Оплаты».
+
+        Обрабатывает преобразование экземпляров оплаты в формат JSON и выполняет валидацию
+        входящие данные для создания оплаты курса.
+        """
+
+    class Meta:
+        model = Payment
+        fields = "__all__"
+        read_only_fields = ["payment_date", "user"]
+
 class UserSerializer(ModelSerializer):
     """
     Сериализатор для модели «Пользователи».

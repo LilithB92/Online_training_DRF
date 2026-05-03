@@ -46,7 +46,7 @@ class Payment(models.Model):
     payment_date = models.DateTimeField(auto_now_add=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
     lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
-    amount = models.PositiveIntegerField(max_length=30, null=True, blank=True, verbose_name="Сумма платежи")
+    amount = models.PositiveIntegerField( null=True, blank=True, verbose_name="Сумма платежи")
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES)
     session_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="ID сессии")
     payment_link = models.URLField(max_length=400, blank=True, null=True, verbose_name="Ссылка платежа")
