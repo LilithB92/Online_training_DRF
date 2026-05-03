@@ -15,7 +15,7 @@ class PaymentSerializer(ModelSerializer):
 
     class Meta:
         model = Payment
-        fields = ("id", "payment_date", "course", "lesson", "amount", "payment_method")
+        fields = "__all__"
         read_only_fields = ["payment_date", "user"]
 
 
@@ -29,8 +29,8 @@ class PaymentCourseSerializer(ModelSerializer):
 
     class Meta:
         model = Payment
-        fields = ("id", "payment_date", "course", "lesson", "amount", "payment_method")
-        read_only_fields = ["payment_date", "user"]
+        fields = "__all__"
+        read_only_fields = ["payment_date", "user", "session_id", "payment_link"]
 
 
 class UserSerializer(ModelSerializer):

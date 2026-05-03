@@ -107,8 +107,7 @@ class PaymentCourseCreateApiView(CreateAPIView):
             stripe_price = create_stripe_price(product=product, price=price)
             session_id, payment_link = create_stipe_session(stripe_price)
             payment.session_id = session_id
-            print(payment_link)
             payment.payment_link = payment_link
             payment.save()
         except Exception as ex:
-            return ex
+            return f"Что то пошел не так с платежом: {ex}"
