@@ -17,6 +17,7 @@ from users.serializers import PaymentSerializer
 from users.serializers import UserGeneralInformationSerializer
 from users.serializers import UserSerializer
 from users.serializers import UserUpdateSerializer
+from users.services import convert_rub_to_usd
 from users.services import create_stipe_session
 from users.services import create_stripe_price
 from users.services import create_stripe_product
@@ -93,17 +94,21 @@ class PaymentCourseCreateApiView(CreateAPIView):
     serializer_class = PaymentCourseSerializer
     permission_classes = (IsAuthenticated,)
 
-
     def perform_create(self, serializer):
         """Создает session_id страйпа для оплаты курса"""
 
         payment = serializer.save(user=self.request.user)
         course = serializer.validated_data.get("course")
         title = course.title
-        price = course.price
-        product = create_stripe_product(name=title)
-        stripe_price = create_stripe_price(product=product, price=price)
-        session_id, payment_link = create_stipe_session(stripe_price)
-        payment.session_id = session_id
-        payment.payment_link = payment_link
-        payment.save()
+        amount = int(course.price)
+        price = convert_rub_to_usd(amount)
+        try:
+            product = create_stripe_product(name=title)
+            stripe_price = create_stripe_price(product=product, price=price)
+            session_id, payment_link = create_stipe_session(stripe_price)
+            payment.session_id = session_id
+            print(payment_link)
+            payment.payment_link = payment_link
+            payment.save()
+        except Exception as ex:
+            return ex

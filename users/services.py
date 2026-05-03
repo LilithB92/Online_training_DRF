@@ -1,3 +1,4 @@
+from forex_python.converter import CurrencyRates
 from stripe import StripeClient
 
 from config.settings import STRIPE_API_KEY
@@ -5,9 +6,15 @@ from config.settings import STRIPE_API_KEY
 api_key = STRIPE_API_KEY
 client = StripeClient(api_key)
 
-def convert_currency(from_currency, to_currency):
-    """Конвертирует валют """
-    pass
+
+def convert_rub_to_usd(amount):
+    """Конвертирует валют"""
+    try:
+        c = CurrencyRates()
+        rate = c.get_rate("RUB", "USD")
+        return int(amount * rate)
+    except Exception as ex:
+        return f"Что- то не так с конвертированием валют: {ex}"
 
 
 def create_stripe_product(name):
