@@ -12,6 +12,7 @@ class Course(models.Model):
     preview = models.ImageField(upload_to="courses/", verbose_name="Превью", blank=True, null=True)
     course_url = models.URLField(verbose_name="Ссылка на курс", blank=True, null=True)
     description = models.TextField(verbose_name="Описание курса", blank=True, null=True)
+    price = models.PositiveIntegerField(max_length=30, null=True, blank=True, verbose_name="Цена курса")
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -58,10 +59,11 @@ class Lesson(models.Model):
 
 class CourseSubscription(models.Model):
     """
-       Stores a single course subscription, related to :model:`lms.Course` and :model:`users.User`.
+    Stores a single course subscription, related to :model:`lms.Course` and :model:`users.User`.
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_subscriptions')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='subscribers')
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="course_subscriptions")
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="subscribers")
 
     class Meta:
-        unique_together = ('user', 'course')
+        unique_together = ("user", "course")
