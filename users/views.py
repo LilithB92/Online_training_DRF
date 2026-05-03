@@ -9,13 +9,18 @@ from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 
+from lms.models import Course
 from users.models import Payment
 from users.models import User
 from users.permissions import IsUserOwner
-from users.serializers import PaymentSerializer, PaymentCourseSerializer
+from users.serializers import PaymentCourseSerializer
+from users.serializers import PaymentSerializer
 from users.serializers import UserGeneralInformationSerializer
 from users.serializers import UserSerializer
 from users.serializers import UserUpdateSerializer
+from users.services import create_stipe_session
+from users.services import create_stripe_price
+from users.services import create_stripe_product
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -86,14 +91,19 @@ class PaymentCourseCreateApiView(CreateAPIView):
     """Создание одной сущности платежа"""
 
     queryset = Payment.objects.all()
-    serializer_class =PaymentCourseSerializer
-    permission_classes = (IsAuthenticated)
+    serializer_class = PaymentCourseSerializer
+    permission_classes = (IsAuthenticated,)
 
     def perform_create(self, serializer):
-        """ Создает session_id страйпа для оплаты курса """
+        """Создает session_id страйпа для оплаты курса"""
 
         payment = serializer.save(user=self.request.user)
-
-        # lesson.owner = self.request.user
-        # lesson.save()
-
+        course = serializer.validated_data.get("course")
+        title = course.title
+        price = course.price
+        product = create_stripe_product(name=title)
+        stripe_price = create_stripe_price(product=product, price=price)
+        session_id, payment_link = create_stipe_session(stripe_price)
+        payment.session_id = session_id
+        payment.payment_link = payment_link
+        payment.save()

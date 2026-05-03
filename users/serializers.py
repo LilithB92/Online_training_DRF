@@ -21,16 +21,17 @@ class PaymentSerializer(ModelSerializer):
 
 class PaymentCourseSerializer(ModelSerializer):
     """
-        Сериализатор для модели «Оплаты».
+    Сериализатор для модели «Оплаты».
 
-        Обрабатывает преобразование экземпляров оплаты в формат JSON и выполняет валидацию
-        входящие данные для создания оплаты курса.
-        """
+    Обрабатывает преобразование экземпляров оплаты в формат JSON и выполняет валидацию
+    входящие данные для создания оплаты курса.
+    """
 
     class Meta:
         model = Payment
-        fields = "__all__"
+        fields = ("id", "payment_date", "course", "lesson", "amount", "payment_method")
         read_only_fields = ["payment_date", "user"]
+
 
 class UserSerializer(ModelSerializer):
     """

@@ -2,52 +2,40 @@ import stripe
 from django.conf import settings
 from stripe import StripeClient
 
+from config.settings import STRIPE_API_KEY
 
-class PaymentByStripeService:
-    """ Оплата курса с API Stripe """
-
-    stripe.api_key = settings("STRIPE_API_KEY")
+api_key = STRIPE_API_KEY
+client = StripeClient(api_key)
 
 
-    def create_stripe_product(self, course):
-        """ Создаем stripe продукт """
-        name = course.title
-        price = course.price
-        client = StripeClient(
-            "sk_test_51TSequQSPeVEH6I7Hg2Uw4MYZvehMVQPHuRADBeATuRHhNr4VNDZQvi2N2mZuROcmVSv0ieI9kcSPH47gRQsDRyl007Qft7vFn")
+def create_stripe_product(name):
+    """Создаем stripe продукт"""
 
-        product = client.v1.products.create({"name": name, "default_price": price})
-        return product
+    product = client.v1.products.create({"name": name})
+    return product
 
-    def create_stripe_price(self, product):
-        """Создаем stripe цена продукта"""
 
-        client = StripeClient(
-            "sk_test_51TSequQSPeVEH6I7Hg2Uw4MYZvehMVQPHuRADBeATuRHhNr4VNDZQvi2N2mZuROcmVSv0ieI9kcSPH47gRQsDRyl007Qft7vFn")
+def create_stripe_price(product, price):
+    """Создаем stripe цена продукта"""
 
-        price = client.v1.prices.create({
+    price = client.v1.prices.create(
+        {
             "currency": "usd",
-            "unit_amount": product.get("default_price"),
-            "product_data": product,
-        })
-        return price
+            "unit_amount": price * 100,
+            "product_data": {"name": product["name"]},
+        }
+    )
+    return price
 
-    def create_stipe_session(self, price):
-        """Создаем сессию на оплату в страйпе"""
 
-        client = StripeClient(
-            "sk_test_51TSey35QOA1pTSChPEKuAT3cxyKcUizSxaAio3ObgTtfI06OLPoq4UoDo4pYFenjkOyXicrXGNDwAmVxaVLYhYSy00BkJceV6M")
+def create_stipe_session(price):
+    """Создаем сессию на оплату в страйпе"""
 
-        session = client.v1.checkout.sessions.create({
+    session = client.v1.checkout.sessions.create(
+        {
             "success_url": "http://127.0.0.1:8000/",
-            "line_items": [{"price": price.get("id"), "quantity": 1}],
+            "line_items": [{"price": price["id"], "quantity": 1}],
             "mode": "payment",
-        })
-        return session.get("id"), session.get("url")
-
-
-
-
-
-
-
+        }
+    )
+    return session["id"], session["url"]

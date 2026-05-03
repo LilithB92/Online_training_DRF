@@ -10,7 +10,7 @@ schema_view = get_schema_view(
         title="LMS (Learning Management System) API",
         default_version="v1",
         description="Это тестовая система управления обучением, представляющая собой "
-                    "программную платформу для создания, администрирования, проведения онлайн-курсов",
+        "программную платформу для создания, администрирования, проведения онлайн-курсов",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="bichakhchyanlilith1992@gmail.com"),
         license=openapi.License(name="Without License"),
