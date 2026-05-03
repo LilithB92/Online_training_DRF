@@ -9,7 +9,6 @@ from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 
-from lms.models import Course
 from users.models import Payment
 from users.models import User
 from users.permissions import IsUserOwner
@@ -93,6 +92,7 @@ class PaymentCourseCreateApiView(CreateAPIView):
     queryset = Payment.objects.all()
     serializer_class = PaymentCourseSerializer
     permission_classes = (IsAuthenticated,)
+
 
     def perform_create(self, serializer):
         """Создает session_id страйпа для оплаты курса"""

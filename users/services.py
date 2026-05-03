@@ -1,11 +1,13 @@
-import stripe
-from django.conf import settings
 from stripe import StripeClient
 
 from config.settings import STRIPE_API_KEY
 
 api_key = STRIPE_API_KEY
 client = StripeClient(api_key)
+
+def convert_currency(from_currency, to_currency):
+    """Конвертирует валют """
+    pass
 
 
 def create_stripe_product(name):
