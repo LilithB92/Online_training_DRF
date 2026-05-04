@@ -42,6 +42,11 @@ class Payment(models.Model):
         ("cash", "Наличные"),
         ("transfer", "Перевод на счет"),
     ]
+
+    STATUS = [
+        ("paid", "Оплачен"),
+        ("unpaid", "Не оплачен"),
+    ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="payments")
     payment_date = models.DateTimeField(auto_now_add=True)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name="payments")
@@ -50,6 +55,7 @@ class Payment(models.Model):
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHOD_CHOICES)
     session_id = models.CharField(max_length=255, blank=True, null=True, verbose_name="ID сессии")
     payment_link = models.TextField(blank=True, null=True, verbose_name="Ссылка платежа")
+    status = models.CharField(max_length=10, choices=STATUS, default="unpaid")
 
     def __str__(self):
         return f"{self.user} - {self.amount} - {self.payment_date}"
