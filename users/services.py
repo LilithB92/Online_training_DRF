@@ -1,3 +1,4 @@
+import stripe
 from forex_python.converter import CurrencyRates
 from stripe import StripeClient
 
@@ -48,3 +49,15 @@ def create_stipe_session(price):
         }
     )
     return session["id"], session["url"]
+
+
+def get_session_status(session_id):
+    """
+    Получает статус сессии из Stripe.
+    """
+    session = stripe.checkout.Session.retrieve(session_id)
+    return {
+        "status": session.status,  # complete, expired, open
+        "payment_status": session.payment_status,  # paid, unpaid
+        "url": session.url,
+    }
