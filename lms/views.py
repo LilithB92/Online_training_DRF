@@ -101,34 +101,32 @@ class LessonDestroyAPIView(DestroyAPIView):
 
 
 class SubscriptionAPIView(APIView):
-    """ API View для управления подпиской пользователя на курс.
+    """API View для управления подпиской пользователя на курс.
 
     Работает в режиме 'toggle' (переключатель): если подписки нет — создает,
     если есть — удаляет.
     """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
         """
-      Обрабатывает POST-запрос на изменение статуса подписки.
-      Ожидает в body:
-      {
-          "course": <int:id_курса>
-      }
-      """
+        Обрабатывает POST-запрос на изменение статуса подписки.
+        Ожидает в body:
+        {
+            "course": <int:id_курса>
+        }
+        """
         user = self.request.user
-        course_id = self.request.data.get('course_id')
+        course_id = self.request.data.get("course_id")
         if not course_id:
-            return Response(
-                {"error": "course_id is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "course_id is required"}, status=status.HTTP_400_BAD_REQUEST)
         course_item = get_object_or_404(Course, id=course_id)
         subs_item = CourseSubscription.objects.filter(user=user, course=course_item)
         if subs_item.exists():
             subs_item.delete()
-            message = 'подписка удалена'
+            message = "подписка удалена"
         else:
             CourseSubscription.objects.create(user=user, course=course_item)
-            message = 'подписка добавлена'
+            message = "подписка добавлена"
         return Response({"message": message}, status=status.HTTP_200_OK)
