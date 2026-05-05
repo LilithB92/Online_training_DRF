@@ -28,6 +28,6 @@ urlpatterns = [
     path("update/<int:pk>/", UserUpdateAPIView.as_view(), name="update"),
     path("delete/<int:pk>/", UserDestroyAPIView.as_view(), name="delete"),
     path("course_payment/", PaymentCourseCreateApiView.as_view(), name="course_payment_create"),
-    path("payment/status/<int:pk>/", PaymentStatusView.as_view(), name="user_detail"),
+    path("payment/status/<int:pk>/", PaymentStatusView.as_view(), name="payment_status"),
 ]
 urlpatterns += router.urls

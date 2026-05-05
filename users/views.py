@@ -117,7 +117,7 @@ class PaymentCourseCreateApiView(CreateAPIView):
 
 
 class PaymentStatusView(RetrieveAPIView):
-    """Проверяет session_id статус оплати у страйпа , и если оплачен то статусплатежа
+    """Проверяет session_id статус оплати у страйпа, и если оплачен то статус платежа
     меняет оплачен, если нет вернет HTTP_400_BAD_REQUEST"""
 
     serializer_class = PaymentSerializer
