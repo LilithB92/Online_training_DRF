@@ -17,6 +17,7 @@ from lms.paginators import LessonCoursePagination
 from lms.serializers import CourseDetailSerializer
 from lms.serializers import CourseSerializer
 from lms.serializers import LessonSerializer
+from lms.tasks import send_email
 from users.permissions import IsModerator
 from users.permissions import IsOwner
 
@@ -126,7 +127,9 @@ class SubscriptionAPIView(APIView):
         if subs_item.exists():
             subs_item.delete()
             message = "подписка удалена"
+            send_email.delay()
         else:
             CourseSubscription.objects.create(user=user, course=course_item)
             message = "подписка добавлена"
+            send_email.delay()
         return Response({"message": message}, status=status.HTTP_200_OK)
