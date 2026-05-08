@@ -17,7 +17,8 @@ from lms.paginators import LessonCoursePagination
 from lms.serializers import CourseDetailSerializer
 from lms.serializers import CourseSerializer
 from lms.serializers import LessonSerializer
-from lms.tasks import send_email
+from lms.services import get_course_subscribed_user
+from lms.tasks import send_course_update_email
 from users.permissions import IsModerator
 from users.permissions import IsOwner
 
@@ -41,6 +42,13 @@ class CourseViewSet(viewsets.ModelViewSet):
         course = serializer.save()
         course.owner = self.request.user
         course.save()
+
+    def perform_update(self, serializer):
+        """ Обновляет курс и отправляет почту об обновление пользователям подписании на этот курс"""
+        course_id = self.kwargs.get("pk")
+        emails = get_course_subscribed_user(course_id)
+        serializer.save()
+        send_course_update_email.delay(course_id=course_id, subscribed_users_emails=emails)
 
     def get_permissions(self):
         """Задает прав для каждого эндпойнта"""
@@ -127,9 +135,7 @@ class SubscriptionAPIView(APIView):
         if subs_item.exists():
             subs_item.delete()
             message = "подписка удалена"
-            send_email.delay()
         else:
             CourseSubscription.objects.create(user=user, course=course_item)
             message = "подписка добавлена"
-            send_email.delay()
         return Response({"message": message}, status=status.HTTP_200_OK)
