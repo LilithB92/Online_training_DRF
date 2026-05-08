@@ -163,9 +163,9 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
 # Настройки для Celery-beat
 CELERY_BEAT_SCHEDULE = {
-    'task-name': {
-        'task': 'myapp.tasks.my_task',  # Путь к задаче
-        'schedule': timedelta(minutes=10),  # Расписание выполнения задачи (например, каждые 10 минут)
+    'deactivate_inactive_users': {
+        'task': 'lms.tasks.deactivate_inactive_users',
+        'schedule': timedelta(days=30),
     },
 }
 
