@@ -76,12 +76,12 @@ REST_FRAMEWORK = {
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.getenv("DATABASE_NAME"),
-        "USER": os.getenv("DATABASE_USER"),
-        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
-        "HOST": os.getenv("DATABASE_HOST"),
-        "PORT": os.getenv("DATABASE_PORT", default="5432"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT", default="5432"),
     }
 }
 
@@ -157,9 +157,9 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 # URL-адрес брокера сообщений
-CELERY_BROKER_URL = "redis://localhost:6379/0"  # Например, Redis, который по умолчанию работает на порту 6379
+CELERY_BROKER_URL =  os.getenv('CELERY_BROKER_URL')  # Например, Redis, который по умолчанию работает на порту 6379
 # URL-адрес брокера результатов, также Redis
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
 # Настройки для Celery-beat
 CELERY_BEAT_SCHEDULE = {
@@ -168,5 +168,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': timedelta(days=30),
     },
 }
+
+
 
 # ALLOWED_HOSTS = ['192.168.31.7']
