@@ -17,6 +17,8 @@ from lms.paginators import LessonCoursePagination
 from lms.serializers import CourseDetailSerializer
 from lms.serializers import CourseSerializer
 from lms.serializers import LessonSerializer
+from lms.services import get_course_subscribed_user
+from lms.tasks import send_course_update_email
 from users.permissions import IsModerator
 from users.permissions import IsOwner
 
@@ -40,6 +42,13 @@ class CourseViewSet(viewsets.ModelViewSet):
         course = serializer.save()
         course.owner = self.request.user
         course.save()
+
+    def perform_update(self, serializer):
+        """ Обновляет курс и отправляет почту об обновление пользователям подписании на этот курс"""
+        course_id = self.kwargs.get("pk")
+        emails = get_course_subscribed_user(course_id)
+        serializer.save()
+        send_course_update_email.delay(course_id=course_id, subscribed_users_emails=emails)
 
     def get_permissions(self):
         """Задает прав для каждого эндпойнта"""
@@ -101,34 +110,32 @@ class LessonDestroyAPIView(DestroyAPIView):
 
 
 class SubscriptionAPIView(APIView):
-    """ API View для управления подпиской пользователя на курс.
+    """API View для управления подпиской пользователя на курс.
 
     Работает в режиме 'toggle' (переключатель): если подписки нет — создает,
     если есть — удаляет.
     """
+
     permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
         """
-      Обрабатывает POST-запрос на изменение статуса подписки.
-      Ожидает в body:
-      {
-          "course": <int:id_курса>
-      }
-      """
+        Обрабатывает POST-запрос на изменение статуса подписки.
+        Ожидает в body:
+        {
+            "course": <int:id_курса>
+        }
+        """
         user = self.request.user
-        course_id = self.request.data.get('course_id')
+        course_id = self.request.data.get("course_id")
         if not course_id:
-            return Response(
-                {"error": "course_id is required"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "course_id is required"}, status=status.HTTP_400_BAD_REQUEST)
         course_item = get_object_or_404(Course, id=course_id)
         subs_item = CourseSubscription.objects.filter(user=user, course=course_item)
         if subs_item.exists():
             subs_item.delete()
-            message = 'подписка удалена'
+            message = "подписка удалена"
         else:
             CourseSubscription.objects.create(user=user, course=course_item)
-            message = 'подписка добавлена'
+            message = "подписка добавлена"
         return Response({"message": message}, status=status.HTTP_200_OK)

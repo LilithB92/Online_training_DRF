@@ -8,18 +8,20 @@ from users.models import User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     """
-       Администрирование модели Пользователь(User).
-       Супер позволяет управлять пользователями и их активностью.
+    Администрирование модели Пользователь(User).
+    Супер позволяет управлять пользователями и их активностью.
     """
+
     list_display = ("id", "email", "phone_number", "avatar", "country")
 
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     """
-       Администрирование модели Оплат(Payment).
-       Супер пользователь следит за оплатами.
+    Администрирование модели Оплат(Payment).
+    Супер пользователь следит за оплатами.
     """
+
     list_display = (
         "user",
         "payment_date",
