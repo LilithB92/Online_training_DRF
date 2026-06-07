@@ -4,7 +4,7 @@ from django.db import models
 
 class Course(models.Model):
     """
-    Stores a single course entry, related to :model:`lms.Lesson` and :model:`users.User`
+   Сохраняет одну запись о курсе, связанную с :model:`lms.Lesson` и :model:`users.User`
     """
 
     title = models.CharField(max_length=200, verbose_name="Название курса")
