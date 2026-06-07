@@ -27,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY}}
+      STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY}}
 
     steps:
       - name: Check out code
