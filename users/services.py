@@ -14,7 +14,7 @@ def convert_rub_to_usd(amount):
         rate = c.get_rate("RUB", "USD")
         return int(amount * rate)
     except Exception as ex:
-        return f"Что- то не так с конвертированием валют: {ex}"
+        raise ValueError(f"Что-то не так с конвертированием валют: {ex}")
 
 
 def create_stripe_product(name):
