@@ -99,21 +99,19 @@ class PaymentCourseCreateApiView(CreateAPIView):
     def perform_create(self, serializer):
         """Создает session_id страйпа для оплаты курса"""
 
-        try:
-            payment = serializer.save(user=self.request.user)
-            course = serializer.validated_data.get("course")
-            title = course.title
-            amount = int(course.price)
-            price = convert_rub_to_usd(amount)
-            product = create_stripe_product(name=title)
-            stripe_price = create_stripe_price(product=product, price=price)
-            session_id, payment_link = create_stipe_session(stripe_price)
-            print(session_id)
-            payment.session_id = session_id
-            payment.payment_link = payment_link
-            payment.save()
-        except Exception as ex:
-            return f"Что то пошел не так с платежом: {ex}"
+        payment = serializer.save(user=self.request.user)
+        course = serializer.validated_data.get("course")
+        title = course.title
+        amount = int(course.price)
+        price = convert_rub_to_usd(amount)
+        if not isinstance(price, int):
+            raise ValueError(f"Ошибка конвертации валюты: {price}")
+        product = create_stripe_product(name=title)
+        stripe_price = create_stripe_price(product=product, price=price)
+        session_id, payment_link = create_stipe_session(stripe_price)
+        payment.session_id = session_id
+        payment.payment_link = payment_link
+        payment.save()
 
 
 class PaymentStatusView(RetrieveAPIView):
