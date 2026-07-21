@@ -1,135 +1,379 @@
-## LMS (Learning Management System, система управления обучением)
+## LMS (Learning Management System)
+
+Платформа для онлайн-обучения, где каждый желающий может размещать свои материалы или курсы.
 
 ---
 
-## Запуск проекта:
+## Технологии
 
-> Запуск Jango проекта через **Run - "название проекта"**
-> или командой **python manage.py runserver** 
-
-### Настройка DRF в Docker
-
-**Клонировать проект:**
->https://github.com/LilithB92/Online_training_DRF.git
-
-<br>
----
-
-## Описание:
-
-> Реализовать платформу для онлайн-обучения. 
-Разработка LMS-системы, в которой каждый желающий может размещать свои полезные материалы или курсы.
-
----
-
-## Технологии:
-- Python
-- Django
-- Django DRF
+- Python 3.13
+- Django 6.0
+- Django REST Framework (DRF)
 - PostgreSQL
-
+- Redis (брокер сообщений / кэш)
+- Celery (асинхронные задачи)
+- Celery Beat (периодические задачи)
+- Stripe (платежи)
+- JWT (authentication via `rest_framework_simplejwt`)
+- Docker / Docker Compose
+- Swagger / OpenAPI (drf-yasg)
+- django-filter (фильтрация)
+- forex-python (конвертация валют)
 
 ---
 
-## Реализация:
+## Структура проекта
 
-**Задание**
+```
+├── config/                  # Настройки Django
+│   ├── settings.py          # Конфигурация проекта
+│   ├── urls.py              # Корневые URL
+│   ├── celery.py            # Настройки Celery
+│   ├── asgi.py / wsgi.py    # ASGI/WSGI точки входа
+├── lms/                     # Приложение "Курсы и уроки"
+│   ├── models.py            # Course, Lesson, CourseSubscription
+│   ├── views.py             # ViewSets / Generic views
+│   ├── serializers.py       # Сериализаторы
+│   ├── services.py          # Бизнес-логика
+│   ├── tasks.py             # Celery-задачи
+│   ├── validators.py        # Валидация ссылок
+│   ├── paginators.py        # Пагинация
+│   ├── tests.py             # Тесты
+│   └── urls.py              # Маршруты lms
+├── users/                   # Приложение "Пользователи и платежи"
+│   ├── models.py            # User, Payment
+│   ├── views.py             # CRUD пользователей, платежи Stripe
+│   ├── serializers.py       # Сериализаторы
+│   ├── services.py          # Stripe API, конвертация валют
+│   ├── permissions.py       # Права доступа
+│   ├── urls.py              # Маршруты users
+│   └── management/commands/ # Кастомные manage.py команды
+├── static/                  # Статические файлы
+├── media/                   # Медиафайлы (загрузки)
+├── .env                     # Переменные окружения (локально)
+├── .env.docker              # Переменные окружения (Docker)
+├── .env.example             # Пример .env
+├── docker-compose.yaml      # Docker Compose
+├── Dockerfile               # Docker образ
+├── requirements.txt         # Зависимости
+├── pyproject.toml           # Конфигурация проекта
+└── manage.py                # Точка входа Django
+```
 
-Создайте новый Django-проект, подключите DRF и внесите все необходимые настройки.
+---
 
-## Модели:
+## Модели
 
-Создайте следующие модели:
+**Пользователь** (`users.User`)
+- Авторизация по email (вместо username)
+- Телефон, город, аватарка
 
-`Пользователь`:
+**Курс** (`lms.Course`)
+- Название, превью, описание, ссылка на видео, цена
+- Владелец (FK на User)
 
-- все поля от обычного пользователя, но авторизацию заменить на email;
-- телефон;
-- город;
-- аватарка.
+**Урок** (`lms.Lesson`)
+- Название, описание, превью, ссылка на видео
+- Курс (FK) + владелец (FK на User)
 
-`Курс`:
+**Подписка на курс** (`lms.CourseSubscription`)
+- Пользователь + курс (unique together)
 
-- название,
-- превью (картинка),
-- описание.
+**Платеж** (`users.Payment`)
+- Пользователь, курс/урок, сумма, метод, session_id (Stripe), статус
 
-`Урок`:
+---
 
-- название,
-- описание,
-- превью (картинка),
-- ссылка на видео.
+## Файлы окружения
 
+Проект использует два файла для переменных окружения:
 
-`Подписка курса`:
+| Файл | Использование | DB_HOST |
+|------|---------------|---------|
+| `.env` | Локальный запуск | `localhost` |
+| `.env.docker` | Docker Compose | `db` |
 
-- курс(FK на модель курса),
-- пользователь (FK на модель пользователя).
+Оба файла добавлены в `.gitignore` и не попадают в репозиторий.
 
-## Валидация:
+### Настройка `.env` (локальный запуск)
 
-Для сохранения уроков и курсов реализуйте дополнительную проверку на отсутствие в материалах ссылок на сторонние ресурсы,
-кроме youtube.com.То есть ссылки на видео можно прикреплять в материалы, а ссылки на сторонние образовательные п
-латформы или личные сайты — нельзя.
+1. Скопировать пример:
+   ```bash
+   cp .env.example .env
+   ```
 
-## Пагинация:
-- Реализуйте пагинацию для вывода всех уроков.
-- Реализуйте пагинацию для вывода всех курсов.
+2. Отредактировать `.env`, указав свои данные БД:
+   ```env
+   POSTGRES_DB=drf
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=your_password
+   DB_HOST=localhost
+   DB_PORT=5432
+   ```
 
+3. Для Stripe payments:
+   ```env
+   STRIPE_API_KEY=sk_test_...
+   ```
 
-## Тестирование:
-Напишите тесты, которые будут проверять корректность работы CRUD уроков и функционал работы подписки на обновления курса.
+4. Для email-уведомлений:
+   ```env
+   EMAIL_HOST_USER=your@email.com
+   EMAIL_HOST_PASSWORD=your_password
+   ```
 
-**Задание**
+### Настройка `.env.docker` (Docker)
 
-Опишите CRUD для моделей курса и урока, но при этом для курса сделайте через ViewSets, а для урока — через Generic-классы.
+Файл `.env.docker` создаётся автоматически при необходимости. Отличается от локального только:
+- `DB_HOST=db` (имя сервиса в docker-compose)
+- `CELERY_BROKER_URL=redis://redis:6379/0`
+- `CELERY_RESULT_BACKEND=redis://redis:6379/0`
 
-Для работы контроллеров опишите простейшие сериализаторы.
+---
+
+## Запуск проекта
+
+### Локально
+
+**Требования:**
+- Python 3.13+
+- PostgreSQL (запущенный на localhost:5432)
+- Redis (опционально, для Celery)
+
+**Шаги:**
+
+1. Клонировать репозиторий:
+   ```bash
+   git clone <repository-url>
+   cd Online_training_DRF
+   ```
+
+2. Настроить `.env` (см. раздел "Файлы окружения").
+
+3. Установить зависимости:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Создать базу данных в PostgresSQL:
+   ```bash
+   createdb drf
+   ```
+
+5. Применить миграции:
+   ```bash
+   python manage.py migrate
+   ```
+
+6. Запустить сервер разработки:
+   ```bash
+   python manage.py runserver
+   ```
+
+   Сервер будет доступен по адресу: http://localhost:8000/
+
+7. (Опционально) Запустить Celery для асинхронных задач:
+   ```bash
+   # В отдельном терминале — воркер
+   celery -A config worker -l INFO
+
+   # В отдельном терминале — планировщик периодических задач
+   celery -A config beat -l INFO -S django
+   ```
+
+8. (Опционально) Создать суперпользователя:
+   ```bash
+   python manage.py create_superuser
+   ```
+
+   Админка: http://localhost:8000/admin/
+
+### Пример после запуска
+
+После запуска сервера (локально или в Docker) доступны следующие эндпоинты:
+
+**Аутентификация:**
 
 ```bash
-Работу каждого эндпоинта необходимо проверять 
-с помощью Postman.
-Также на данном этапе работы мы не заботимся о безопасности 
-и не закрываем от редактирования объекты и модели 
-даже самой простой авторизацией.
+# Получить JWT токен
+curl -X POST http://localhost:8000/users/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "admin12345"}'
+
+# Обновить токен
+curl -X POST http://localhost:8000/users/token/refresh/ \
+  -H "Content-Type: application/json" \
+  -d '{"refresh": "<refresh_token>"}'
 ```
-**Авторизация и регистрация **
 
-Реализован CRUD для пользователей, в том числе регистрацию пользователей, 
-настроен в проекте использование JWT-авторизации и закрыт каждый эндпоинт авторизации.
+**Пользователи:**
 
-**Права Доступа **
+```bash
+# Регистрация
+curl -X POST http://localhost:8000/users/create/ \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "mypassword123"}'
 
-- Модератор может просматривать и редактировать любые уроки и курсы, но не может удалять и создавать уроки и курсы.
-- Пользователи, но не Модераторы имеют право просматривать и редактировать только свои объекты. 
+# Список пользователей (требуется JWT)
+curl http://localhost:8000/users/ \
+  -H "Authorization: Bearer <access_token>"
+```
 
-## Шаги для запуска проекта через 
-docker-compose:
-1. Копирование Dockerfile и Docker-compose.yml
-2. Настройка файла .env (Конфиденциальность)
-3. Проверка файлов исключений .gitignore и .dockerignore
+**Курсы:**
 
+```bash
+# Список курсов
+curl http://localhost:8000/courses/ \
+  -H "Authorization: Bearer <access_token>"
 
-## Первый запуск 
-1.  Остановит и удалит все контейнеры, сети, и ТОМЫ (postgres_data, media)
+# Детальная информация о курсе (с уроками и подпиской)
+curl http://localhost:8000/courses/1/ \
+  -H "Authorization: Bearer <access_token>"
+
+# Создать курс
+curl -X POST http://localhost:8000/courses/ \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Python для начинающих", "description": "Базовый курс Python", "price": 15000}'
+```
+
+**Подписка на курс:**
+
+```bash
+# Подписаться / отписаться (toggle)
+curl -X POST http://localhost:8000/subscribe/ \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"course": 1}'
+```
+
+**Платежи:**
+
+```bash
+# Создать платеж (возвращает session_id и payment_link от Stripe)
+curl -X POST http://localhost:8000/payment/pay/ \
+  -H "Authorization: Bearer <access_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"course": 1, "payment_method": "transfer"}'
+
+# Проверить статус платежа
+curl http://localhost:8000/payment/status/1/ \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Документация:**
+
+- Swagger UI: http://localhost:8000/swagger/
+- ReDoc: http://localhost:8000/redoc/
+- Админка: http://localhost:8000/admin/
+
+### Через Docker
+
+**Требования:**
+- Docker
+- Docker Compose
+
+**Шаги:**
+
+1. Собрать и запустить все сервисы:
    ```bash
-    docker-compose down --volumes --remove-orphans --rmi all
+   docker compose up -d --build
    ```
-2. Запустит все сервисы и соберет образы
+
+2. Проверить статус контейнеров:
    ```bash
-    docker compose up -d --build
+   docker compose ps
    ```
-*  -d: Запустить в фоновом режиме.
-  •  --build: Пересобрать образы (особенно важно после изменений в Dockerfile).
-3. Проверит статус контейнеров(Все сервисы должны быть в статусе Up или Running)
-      ```bash
-    docker compose ps 
+
+3. Создать суперпользователя:
+   ```bash
+   docker compose exec web python manage.py create_superuser
    ```
-4. Покажет логи (для отладки)
-      ```bash
-     docker compose logs -f 
+
+4. Для просмотра логов:
+   ```bash
+   docker compose logs -f
    ```
-5. Проверьте веб-приложение:
-  Откройте браузер и перейдите на http://localhost:8000/. Должна открыться страница Django.
-  Проверьте админку: http://localhost:8000/admin/.
+
+5. Остановить проект:
+   ```bash
+   docker compose down
+   ```
+
+   Полная очистка (с удалением томов БД):
+   ```bash
+   docker compose down --volumes
+   ```
+
+---
+
+## Запуск тестов
+
+### Все тесты
+
+```bash
+python manage.py test
+```
+
+### Тесты конкретного приложения
+
+```bash
+# Только lms
+python manage.py test lms
+
+# Только users
+python manage.py test users
+```
+
+### С coverage-отчётом
+
+```bash
+# Установить coverage
+pip install coverage
+
+# Запустить тесты с замером покрытия
+coverage run manage.py test
+
+# Показать отчёт в терминале
+coverage report
+
+# Создать HTML-отчёт (открыть htmlcov/index.html)
+coverage html
+```
+
+### В Docker
+
+```bash
+docker compose exec web python manage.py test
+```
+
+---
+
+## Права доступа
+
+- **Модератор** — просмотр и редактирование любых уроков и курсов, без удаления и создания
+- **Владелец** — полный доступ к своим объектам
+- **Аутентифицированный пользователь** — базовый доступ
+
+---
+
+## Валидация
+
+Ссылки на видео разрешены только с **youtube.com** (проверка через `YoutubeChanelValidator`).
+
+---
+
+## Платежи (Stripe)
+
+Оплата курсов через Stripe Checkout Session:
+- Создание продукта и цены в Stripe
+- Конвертация RUB → USD (forex-python)
+- Проверка статуса платежа
+
+---
+
+## Документация API
+
+Swagger доступен после запуска:
+- `/swagger/` — Swagger UI
+- `/redoc/` — ReDoc

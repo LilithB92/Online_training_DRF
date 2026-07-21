@@ -60,13 +60,7 @@ class CourseDetailSerializer(ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
 
     def get_is_subscribed(self, obj):
-        """
-        Проверяет наличие подписки у пользователя.
-
-        :param obj: Экземпляр модели Course.
-        :return: True, если подписка существует, иначе False.
-        """
-        user = obj.owner
+        user = self.context["request"].user
         return CourseSubscription.objects.filter(user=user, course=obj).exists()
 
     def get_lessons_count(self, obj):

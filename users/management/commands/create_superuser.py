@@ -1,3 +1,5 @@
+import os
+
 from django.core.management.base import BaseCommand
 
 from users.models import User
@@ -6,15 +8,20 @@ from users.models import User
 class Command(BaseCommand):
     help = "Создать супер юзера"
 
-    def handle(self, *args, **options):
-        user = User.objects.create(email="admin@gmail.com")
-        user.is_active = True
-        user.is_staff = True
-        user.is_superuser = True
-        user.set_password("admin1111")
-        user.save()
+    def add_arguments(self, parser):
+        parser.add_argument("--email", type=str, help="Email суперпользователя")
+        parser.add_argument("--password", type=str, help="Пароль суперпользователя")
 
-        if user:
-            self.stdout.write(self.style.SUCCESS(f"Successfully added superuser: {user.__str__()}"))
+    def handle(self, *args, **options):
+        email = options["email"] or os.getenv("SUPERUSER_EMAIL", "admin@example.com")
+        password = options["password"] or os.getenv("SUPERUSER_PASSWORD", "admin12345")
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={"is_active": True, "is_staff": True, "is_superuser": True},
+        )
+        if created:
+            user.set_password(password)
+            user.save()
+            self.stdout.write(self.style.SUCCESS(f"Successfully created superuser: {user.email}"))
         else:
-            self.stdout.write(self.style.WARNING(f"Superuser already exists: {user.__str__()}"))
+            self.stdout.write(self.style.WARNING(f"Superuser already exists: {user.email}"))

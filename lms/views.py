@@ -127,9 +127,9 @@ class SubscriptionAPIView(APIView):
         }
         """
         user = self.request.user
-        course_id = self.request.data.get("course_id")
+        course_id = self.request.data.get("course")
         if not course_id:
-            return Response({"error": "course_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "course is required"}, status=status.HTTP_400_BAD_REQUEST)
         course_item = get_object_or_404(Course, id=course_id)
         subs_item = CourseSubscription.objects.filter(user=user, course=course_item)
         if subs_item.exists():
